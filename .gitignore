@@ -184,3 +184,11 @@ dist
 .ionide
 
 # End of https://www.toptal.com/developers/gitignore/api/laravel,node,visualstudiocode
+
+# Arquivos JSON de testes manuais
+*.json
+!package.json
+!package-lock.json
+!composer.json
+!composer.lock
+!tsconfig*.json
