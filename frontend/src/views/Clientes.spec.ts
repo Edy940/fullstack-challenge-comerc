@@ -61,7 +61,6 @@ describe('Clientes.vue', () => {
     await wrapper.vm.$nextTick()
 
     const inputs = wrapper.findAll('input')
-    // nome, email, telefone, data_nascimento, cep, endereco, bairro, complemento
     if (inputs.length >= 4) {
       await inputs[0].setValue('João Silva')
       await inputs[1].setValue('joao@test.com')

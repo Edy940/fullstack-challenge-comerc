@@ -58,7 +58,6 @@ describe('Pedidos.vue', () => {
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 50))
 
-    // Adiciona dois itens
     const addBtn = wrapper.findAll('button').find(btn => btn.text().includes('+ Item'))
     await addBtn?.trigger('click')
     await addBtn?.trigger('click')
@@ -107,13 +106,10 @@ describe('Pedidos.vue', () => {
     const selects = wrapper.findAll('select')
     const inputs = wrapper.findAll('input')
 
-    // Seleciona cliente
     await selects[0].setValue('1')
     await wrapper.vm.$nextTick()
-    // Seleciona produto
     await selects[1].setValue('1')
     await wrapper.vm.$nextTick()
-    // Define quantidade e preço
     await inputs[0].setValue('2')
     await inputs[1].setValue('5.50')
     await wrapper.vm.$nextTick()

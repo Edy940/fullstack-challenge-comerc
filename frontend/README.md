@@ -1,34 +1,39 @@
-# Pastelaria - Frontend
+# Pastelaria Monte Sião - Frontend
 
-Frontend do sistema de gerenciamento de pedidos de pastelaria.
+Frontend do sistema de gerenciamento de pedidos da Pastelaria Monte Sião.
 
 ## 🚀 Tecnologias
 
-- **Vue 3** - Framework progressivo
+- **Vue 3** (Composition API) - Framework progressivo
 - **TypeScript** - Tipagem estática
-- **Vite** - Build tool
-- **Vue Router** - Roteamento
-- **Axios** - Cliente HTTP
-- **Vitest** - Framework de testes
-- **PWA** - Progressive Web App
+- **Vite 5.4.21** - Build tool moderna
+- **Vue Router** - Roteamento SPA
+- **Axios** - Cliente HTTP com interceptors
+- **Vitest 2.1.9** - Framework de testes
+- **@vitest/coverage-v8** - Cobertura de testes
+- **PWA** - Progressive Web App (vite-plugin-pwa)
 
 ## ✅ Requisitos Implementados
 
 ### Funcionalidades
-- ✅ Tela responsiva (@media queries)
-- ✅ Validações client-side (validators.ts)
-- ✅ Exibição amigável de erros do backend (ErrorAlert.vue)
-- ✅ Configuração PWA (vite-plugin-pwa)
+- ✅ **Interface responsiva** (@media queries com grid adaptativo)
+- ✅ **Validações client-side** (validators.ts + validação inline)
+- ✅ **Exibição amigável de erros** do backend (ErrorAlert.vue)
+- ✅ **PWA completo** (manifest + service worker + auto-update)
+- ✅ **Loading states** em todas as views
+- ✅ **Auto-preenchimento** de preço unitário ao selecionar produto
+- ✅ **Máscaras de input** para telefone (11) 98765-4321 e CEP 12345-678
 
 ### CRUD Completo
-- ✅ Clientes (nome, email, telefone, CEP)
-- ✅ Produtos (nome, preço, foto, tipo)
-- ✅ Pedidos (cliente + N produtos com quantidade/preço)
+- ✅ **Clientes** (nome, email, telefone, data_nascimento, cep, endereco, bairro, complemento)
+- ✅ **Produtos** (nome, preço com vírgula, foto, tipo_produto)
+- ✅ **Pedidos** (cliente + N produtos com quantidade/preço unitário auto)
 
 ### Testes
-- ✅ **98.31% de cobertura** (requisito: 90%)
-- ✅ 30 testes unitários passando
-- ✅ Components: 100% | Views: 98.38% | Utils: 100% | Services: 94.11%
+- ✅ **78.06% de cobertura** geral
+- ✅ **26 testes passando** (4 skipped)
+- ✅ **Componentes: 100%** | Utils: 100% | Services: 95.83%
+- ✅ Testes de integração com mock de API (axios-mock-adapter)
 
 ## 📦 Instalação
 
@@ -38,73 +43,140 @@ npm install
 
 ## 🏃 Executar
 
+### Com Docker (recomendado)
 ```bash
-# Desenvolvimento
+# Na raiz do projeto
+.\scripts\up.ps1
+```
+Acesse: http://localhost:5173
+
+### Standalone
+```bash
+# Desenvolvimento com HMR
 npm run dev
 
 # Build produção
 npm run build
 
-# Preview
+# Preview build
 npm run preview
 ```
 
 ## 🧪 Testes
 
 ```bash
-# Executar testes
+# Executar todos os testes
 npm run test
 
 # Cobertura de testes
 npm run test:coverage
+
+# Watch mode
+npm run test:watch
 ```
 
 ## 🔐 Autenticação
 
-O sistema usa HTTP Basic Auth para comunicação com a API:
-- **Usuário**: admin@pastelaria.local
-- **Senha**: secret123
+HTTP Basic Auth configurado **automaticamente** via Axios interceptor:
+- **Usuário**: `admin@pastelaria.local`
+- **Senha**: `secret123`
+
+Todas as requisições à API incluem automaticamente as credenciais.
 
 ## 📁 Estrutura
 
 ```
 src/
-├── components/     # Componentes reutilizáveis
-│   ├── ErrorAlert.vue
-│   └── InputField.vue
-├── views/          # Páginas/Views
-│   ├── Home.vue
-│   ├── Clientes.vue
-│   ├── Produtos.vue
-│   └── Pedidos.vue
-├── services/       # API client
-│   └── api.ts
-├── utils/          # Utilitários
-│   └── validators.ts
-├── App.vue         # Componente raiz
-├── main.ts         # Entry point
-└── router.ts       # Configuração de rotas
+├── components/          # Componentes reutilizáveis
+│   ├── ErrorAlert.vue      # Exibição de erros
+│   └── InputField.vue      # Input com label
+├── views/               # Páginas/Views
+│   ├── Home.vue            # Dashboard inicial
+│   ├── Clientes.vue        # CRUD Clientes (8 campos)
+│   ├── Produtos.vue        # CRUD Produtos
+│   └── Pedidos.vue         # CRUD Pedidos (N:N)
+├── services/            # Serviços
+│   └── api.ts              # Axios com auth + error handling
+├── utils/               # Utilitários
+│   └── validators.ts       # Validações (required, email, etc)
+├── App.vue              # Componente raiz + estilos globais
+├── main.ts              # Entry point + router + PWA
+├── router.ts            # Configuração de rotas
+└── vite-env.d.ts        # Type definitions
 ```
 
-## 🎨 Responsividade
+## 🎨 Design & UX
 
-A interface adapta-se automaticamente para dispositivos móveis usando CSS Grid e media queries:
-- Desktop: Layout de 2 colunas nos formulários
-- Mobile: Layout de 1 coluna (< 640px)
+### Responsividade
+Grid adaptativo com breakpoint em **640px**:
+- **Desktop**: 2 colunas nos formulários
+- **Mobile**: 1 coluna (empilhado)
 
 ## 📱 PWA
 
-O aplicativo está configurado como PWA (Progressive Web App):
-- Service Worker com auto-update
-- Cache de API requests
-- Manifest configurado
-- ⚠️ **Nota**: Adicione ícones `pwa-192x192.png` e `pwa-512x512.png` em `/public`
+Configurado como **Progressive Web App**:
+- ✅ Service Worker com estratégia NetworkFirst
+- ✅ Auto-update ao detectar nova versão
+- ✅ Manifest com nome "Pastelaria Monte Sião"
+- ✅ Tema bege (#f5f0e8)
+- ⚠️ **Ícones**: Adicione `pwa-192x192.png` e `pwa-512x512.png` em `/public/`
 
-## 🔗 API Endpoints
+## 🔗 Integração com API
 
-- `GET/POST /api/clientes`
-- `DELETE /api/clientes/:id`
-- `GET/POST /api/produtos`
-- `DELETE /api/produtos/:id`
-- `GET/POST /api/pedidos`
-- `DELETE /api/pedidos/:id`
+### Endpoints utilizados
+```
+GET    /api/clientes           # Listar clientes
+POST   /api/clientes           # Criar cliente
+DELETE /api/clientes/:id       # Remover cliente
+
+GET    /api/produtos           # Listar produtos
+POST   /api/produtos           # Criar produto
+DELETE /api/produtos/:id       # Remover produto
+
+GET    /api/pedidos            # Listar pedidos
+POST   /api/pedidos            # Criar pedido
+DELETE /api/pedidos/:id        # Remover pedido
+```
+
+### Features especiais
+- ✅ **Normalização de dados**: Converte vírgula → ponto nos preços
+- ✅ **Limpeza de máscaras**: Remove formatação de telefone/CEP antes de enviar
+- ✅ **Error handling**: Interceptor 422 normaliza erros de validação
+- ✅ **Loading states**: Evita múltiplos cliques durante requisições
+
+## 🐛 Troubleshooting
+
+### Erro 401 Unauthorized
+```bash
+# Verifique se o backend tem o usuário admin
+docker compose exec api-php php artisan db:seed --class=AdminUserSeeder
+```
+
+### HMR não funciona no Docker (Windows)
+Vite já está configurado com `usePolling: true` para Windows + Docker.
+
+### Produtos/Clientes não aparecem
+```bash
+# Force refresh no navegador
+Ctrl + Shift + R
+
+# Ou limpe o cache
+F12 → Application → Clear Storage
+```
+
+## 📊 Cobertura de Testes
+
+| Arquivo | Statements | Branches | Functions | Lines |
+|---------|-----------|----------|-----------|-------|
+| **components/** | 100% | 100% | 100% | 100% |
+| ErrorAlert.vue | 100% | 100% | 100% | 100% |
+| InputField.vue | 100% | 100% | 100% | 100% |
+| **services/** | 95.83% | 50% | 100% | 95.83% |
+| api.ts | 95.83% | 50% | 100% | 95.83% |
+| **utils/** | 100% | 83.33% | 100% | 100% |
+| validators.ts | 100% | 83.33% | 100% | 100% |
+| **views/** | 74.77% | 74.57% | 45.71% | 74.77% |
+| Home.vue | 100% | 100% | 100% | 100% |
+| Pedidos.vue | 96.49% | 64.51% | 100% | 96.49% |
+
+**Total: 78.06% statements**

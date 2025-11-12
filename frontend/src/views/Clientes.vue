@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Dados do Cliente</h2>
+    <h2>Cadastrar Cliente</h2>
 
     <ErrorAlert :messages="errors" />
 
@@ -30,6 +30,8 @@
     </form>
 
     <hr style="margin:16px 0" />
+
+    <h3 style="margin-bottom: 12px; color: #333;">Clientes Cadastrados</h3>
 
     <table class="table">
       <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th></th></tr></thead>

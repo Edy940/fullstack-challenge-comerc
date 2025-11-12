@@ -23,13 +23,13 @@
       <div v-for="(i,idx) in form.itens" :key="idx" class="form-row" style="align-items:end">
         <label class="field">
           <span>Produto</span>
-          <select v-model.number="i.produto_id">
+          <select v-model.number="i.produto_id" @change="atualizarPreco(idx)">
             <option value="0" disabled>Selecione um produto</option>
             <option :value="p.id" v-for="p in produtos" :key="p.id">{{ p.nome }} (R$ {{ Number(p.preco).toFixed(2) }})</option>
           </select>
         </label>
         <InputField label="Quantidade" type="number" v-model="i.quantidade" />
-        <InputField label="Preço unitário" type="text" v-model="i.preco_unitario" placeholder="Ex: 15,99" />
+        <InputField label="Preço unitário" type="text" v-model="i.preco_unitario" placeholder="R$ " readonly style="background:#f5f5f5" />
         <button class="btn ghost" type="button" @click="removerItem(idx)">Remover</button>
       </div>
 
@@ -68,6 +68,15 @@ const form = ref<any>({ cliente_id: 0, itens: [] });
 
 function addItem(){ form.value.itens.push({ produto_id: 0, quantidade: 1, preco_unitario: "" }); }
 function removerItem(idx:number){ form.value.itens.splice(idx,1); }
+
+function atualizarPreco(idx: number) {
+  const item = form.value.itens[idx];
+  const produto = produtos.value.find((p: any) => p.id === item.produto_id);
+  if (produto) {
+    // Preenche automaticamente o preço do produto selecionado
+    item.preco_unitario = Number(produto.preco).toFixed(2).replace('.', ',');
+  }
+}
 
 async function carregar(){
   try {
