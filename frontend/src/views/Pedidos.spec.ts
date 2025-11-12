@@ -19,7 +19,7 @@ describe('Pedidos.vue', () => {
     const wrapper = mount(Pedidos)
     await wrapper.vm.$nextTick()
     await new Promise(resolve => setTimeout(resolve, 50))
-    expect(wrapper.find('h2').text()).toBe('Pedidos')
+    expect(wrapper.find('h2').text()).toBe('Realizar Pedido')
     expect(wrapper.findAll('select').length).toBeGreaterThan(0)
   })
 

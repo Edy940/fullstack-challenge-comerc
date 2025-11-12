@@ -30,9 +30,9 @@ Frontend do sistema de gerenciamento de pedidos da Pastelaria Monte Sião.
 - ✅ **Pedidos** (cliente + N produtos com quantidade/preço unitário auto)
 
 ### Testes
-- ✅ **78.06% de cobertura** geral
-- ✅ **26 testes passando** (4 skipped)
-- ✅ **Componentes: 100%** | Utils: 100% | Services: 95.83%
+- ✅ **79.24% de cobertura** geral
+- ✅ **34 testes passando** (14 skipped)
+- ✅ **Components: 100%** | Services: 100% | Utils: 100% | Views: 76.33%
 - ✅ Testes de integração com mock de API (axios-mock-adapter)
 
 ## 📦 Instalação
@@ -166,17 +166,12 @@ F12 → Application → Clear Storage
 
 ## 📊 Cobertura de Testes
 
-| Arquivo | Statements | Branches | Functions | Lines |
-|---------|-----------|----------|-----------|-------|
+| Categoria | Statements | Branches | Functions | Lines |
+|-----------|-----------|----------|-----------|-------|
+| **Total** | 79.24% | 81.98% | 59.57% | 79.24% |
 | **components/** | 100% | 100% | 100% | 100% |
-| ErrorAlert.vue | 100% | 100% | 100% | 100% |
-| InputField.vue | 100% | 100% | 100% | 100% |
-| **services/** | 95.83% | 50% | 100% | 95.83% |
-| api.ts | 95.83% | 50% | 100% | 95.83% |
+| **services/** | 100% | 70% | 100% | 100% |
 | **utils/** | 100% | 83.33% | 100% | 100% |
-| validators.ts | 100% | 83.33% | 100% | 100% |
-| **views/** | 74.77% | 74.57% | 45.71% | 74.77% |
-| Home.vue | 100% | 100% | 100% | 100% |
-| Pedidos.vue | 96.49% | 64.51% | 100% | 96.49% |
+| **views/** | 76.33% | 82.14% | 52.5% | 76.33% |
 
-**Total: 78.06% statements**
+**34 testes passando | 14 skipped**

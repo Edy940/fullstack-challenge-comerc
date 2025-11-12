@@ -33,30 +33,48 @@ git clone https://github.com/Edy940/fullstack-challenge-comerc.git
 cd fullstack-challenge-comerc
 ```
 
-### 2. Na raiz do projeto, execute:
+### 2. Subir o ambiente (na raiz do projeto)
 
-# subir tudo (API, DB, Mailhog, Front)
-Subir ambiente
+```powershell
+# Subir tudo (API, DB, Mailhog, Frontend)
 .\scripts\up.ps1
-Resultado no Shell ao subir o ambiente (Clique nos links e seja direcionado)
+```
+
+**Resultado esperado:**
+```
 == Pronto! ==
 API:      http://localhost:8080
 Frontend: http://localhost:5173
 Mailhog:  http://localhost:8025
+```
 
-# Se quiser fazer rebuild
-Rebuild completo
+### 3. Acessar a aplicação
+
+- **Frontend:** http://localhost:5173
+- **Login:** `admin@pastelaria.local` / `secret123`
+
+### Comandos adicionais
+
+```powershell
+# Rebuild completo (se houver problemas)
 .\scripts\up.ps1 -Rebuild
 
-# Se quiser zerar o banco para novos testes 
-Recriar banco e dados de exemplo
+# Recriar banco e dados de exemplo
 .\scripts\refresh.ps1
 
-# subir tudo (API, DB, Mailhog, Front)
+# Parar todos os containers
 .\scripts\down.ps1
+```
 
-2.2 Utilizando o Docker
- docker compose up -d
+### Alternativa (Docker Compose diretamente)
+
+```bash
+# Subir containers
+docker compose up -d
+
+# Rodar migrations e seeders
+docker compose exec api-php php artisan migrate:fresh --seed --force
+```
 ---
 
 ## 🧪 Testes
@@ -73,7 +91,7 @@ docker compose exec api-php php artisan test --filter=test_email_unico
 # Ou especificar o arquivo completo
 docker compose exec api-php php artisan test tests/Feature/ClienteTest.php
 
-# Cobertura alcançada: 97.3%
+# Cobertura alcançada: 92.3%
 # Total: 17 testes, 67 assertions
 ```
 
