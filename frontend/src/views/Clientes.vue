@@ -5,7 +5,7 @@
     <ErrorAlert :messages="errors" />
 
     <div v-if="loading" style="text-align:center; padding:20px; color:#666;">
-      Carregando dados dos Clientes...
+      Carregando dados do Cliente...
     </div>
 
     <form v-else @submit.prevent="salvar">
@@ -18,7 +18,7 @@
         <InputField label="Data de Nascimento" v-model="form.data_nascimento" type="date" />
       </div>
       <div class="form-row">
-        <InputField label="CEP" v-model="form.cep" @input="aplicarMascaraCep" placeholder="00000-000" maxlength="9" />
+        <InputField label="CEP (digite um CEP válido)" v-model="form.cep" @input="aplicarMascaraCep" @blur="buscarCep" @keydown.enter.prevent="buscarCep" placeholder="00000-000" maxlength="9" />
         <InputField label="Endereço" v-model="form.endereco" placeholder="Rua, Av, etc" />
       </div>
       <div class="form-row">
@@ -56,6 +56,7 @@ import InputField from "@/components/InputField.vue";
 import ErrorAlert from "@/components/ErrorAlert.vue";
 import { ref, onMounted } from "vue";
 import { required, email as emailVal } from "@/utils/validators";
+import { formatarTelefone, formatarCep, limparTelefone, limparCep } from "@/utils/formatters";
 
 const form = ref({ 
   nome: "", 
@@ -101,8 +102,8 @@ async function salvar() {
     // Remove máscaras antes de enviar para o backend
     const payload = {
       ...form.value,
-      telefone: form.value.telefone.replace(/\D/g, ''),
-      cep: form.value.cep.replace(/\D/g, '')
+      telefone: limparTelefone(form.value.telefone),
+      cep: limparCep(form.value.cep)
     };
     
     if (editandoId.value) {
@@ -164,26 +165,42 @@ async function remover(id:number){
 // Máscaras
 function aplicarMascaraTelefone(e: Event) {
   const input = e.target as HTMLInputElement;
-  let valor = input.value.replace(/\D/g, ''); // Remove tudo que não é dígito
-  
-  if (valor.length <= 10) {
-    // (00) 0000-0000
-    valor = valor.replace(/(\d{2})(\d)/, '($1) $2');
-    valor = valor.replace(/(\d{4})(\d)/, '$1-$2');
-  } else {
-    // (00) 00000-0000
-    valor = valor.replace(/(\d{2})(\d)/, '($1) $2');
-    valor = valor.replace(/(\d{5})(\d)/, '$1-$2');
-  }
-  
-  form.value.telefone = valor;
+  form.value.telefone = formatarTelefone(input.value);
 }
 
 function aplicarMascaraCep(e: Event) {
   const input = e.target as HTMLInputElement;
-  let valor = input.value.replace(/\D/g, ''); // Remove tudo que não é dígito
-  valor = valor.replace(/(\d{5})(\d)/, '$1-$2'); // 00000-000
-  form.value.cep = valor;
+  form.value.cep = formatarCep(input.value);
+}
+
+async function buscarCep() {
+  const cepLimpo = form.value.cep.replace(/\D/g, '');
+  
+  // Verifica se tem 8 dígitos
+  if (cepLimpo.length !== 8) return;
+  
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+    const dados = await r.json();
+    
+    if (dados.erro) {
+      errors.value = ['CEP não encontrado'];
+      return;
+    }
+    
+    // Preenche automaticamente os campos
+    form.value.endereco = dados.logradouro || '';
+    form.value.bairro = dados.bairro || '';
+    if (dados.complemento) {
+      form.value.complemento = dados.complemento;
+    }
+    
+    // Limpa erro se tinha
+    errors.value = [];
+  } catch (err) {
+    console.error('Erro ao buscar CEP:', err);
+    // Não mostra erro para não quebrar o fluxo
+  }
 }
 
 onMounted(carregar);

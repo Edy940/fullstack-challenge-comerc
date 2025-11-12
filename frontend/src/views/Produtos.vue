@@ -48,6 +48,7 @@ import InputField from "@/components/InputField.vue";
 import ErrorAlert from "@/components/ErrorAlert.vue";
 import { ref, onMounted } from "vue";
 import { required, minValue } from "@/utils/validators";
+import { normalizarPreco } from "@/utils/formatters";
 
 const form = ref({ nome:"", preco: "", foto:"", tipo_produto_id: 1 });
 const lista = ref<any[]>([]);
@@ -77,7 +78,7 @@ async function carregar() {
 
 function validar(): string[] {
   const e: string[] = [];
-  [required(form.value.nome, "Nome"), required(form.value.foto, "Foto"), minValue(Number(String(form.value.preco).replace(',', '.')), "Preço", 0)]
+  [required(form.value.nome, "Nome"), required(form.value.foto, "Foto"), minValue(normalizarPreco(form.value.preco), "Preço", 0)]
     .filter(Boolean)
     .forEach((m: any) => e.push(m));
   if (!form.value.tipo_produto_id) e.push("Tipo é obrigatório");
@@ -91,7 +92,7 @@ async function salvar() {
   try {
     const payload = {
       ...form.value,
-      preco: Number(String(form.value.preco).replace(',', '.'))
+      preco: normalizarPreco(form.value.preco)
     };
     await api.post("/api/produtos", payload);
     await carregar();
