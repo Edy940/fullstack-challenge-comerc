@@ -1,23 +1,37 @@
 <template>
   <div>
-    <h2>Clientes</h2>
+    <h2>{{ editandoId ? 'Editar Cliente' : 'Cadastrar Cliente' }}</h2>
 
     <ErrorAlert :messages="errors" />
 
-    <form @submit.prevent="salvar">
+    <div v-if="loading" style="text-align:center; padding:20px; color:#666;">
+      Carregando dados do Cliente...
+    </div>
+
+    <form v-else @submit.prevent="salvar">
       <div class="form-row">
         <InputField label="Nome" v-model="form.nome" />
         <InputField label="E-mail" v-model="form.email" type="email" />
       </div>
       <div class="form-row">
-        <InputField label="Telefone" v-model="form.telefone" />
-        <InputField label="CEP" v-model="form.cep" />
+        <InputField label="Telefone" v-model="form.telefone" @input="aplicarMascaraTelefone" placeholder="(00) 00000-0000" maxlength="15" />
+        <InputField label="Data de Nascimento" v-model="form.data_nascimento" type="date" />
       </div>
-      <button class="btn" type="submit">Salvar</button>
-      <button class="btn ghost" type="button" @click="reset">Limpar</button>
+      <div class="form-row">
+        <InputField label="CEP (digite um CEP válido)" v-model="form.cep" @input="aplicarMascaraCep" @blur="buscarCep" @keydown.enter.prevent="buscarCep" placeholder="00000-000" maxlength="9" />
+        <InputField label="Endereço" v-model="form.endereco" placeholder="Rua, Av, etc" />
+      </div>
+      <div class="form-row">
+        <InputField label="Bairro" v-model="form.bairro" />
+        <InputField label="Complemento" v-model="form.complemento" placeholder="Apto, Bloco, etc (opcional)" />
+      </div>
+      <button class="btn" type="submit">{{ editandoId ? 'Atualizar' : 'Salvar' }}</button>
+      <button class="btn ghost" type="button" @click="reset">{{ editandoId ? 'Cancelar' : 'Limpar' }}</button>
     </form>
 
     <hr style="margin:16px 0" />
+
+    <h3 style="margin-bottom: 12px; color: #333;">Clientes Cadastrados</h3>
 
     <table class="table">
       <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th></th></tr></thead>
@@ -26,7 +40,10 @@
           <td>{{ c.id }}</td>
           <td>{{ c.nome }}</td>
           <td>{{ c.email }}</td>
-          <td><button class="btn ghost" @click="remover(c.id)">Remover</button></td>
+          <td>
+            <button class="btn ghost" @click="editar(c)" style="margin-right: 8px;">Editar</button>
+            <button class="btn ghost" @click="remover(c.id)">Remover</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -39,16 +56,34 @@ import InputField from "@/components/InputField.vue";
 import ErrorAlert from "@/components/ErrorAlert.vue";
 import { ref, onMounted } from "vue";
 import { required, email as emailVal } from "@/utils/validators";
+import { formatarTelefone, formatarCep, limparTelefone, limparCep } from "@/utils/formatters";
 
-const auth = { auth: { username: "admin@pastelaria.local", password: "secret123" } };
-
-const form = ref({ nome: "", email: "", telefone: "", cep: "" });
+const form = ref({ 
+  nome: "", 
+  email: "", 
+  telefone: "", 
+  data_nascimento: "",
+  cep: "",
+  endereco: "",
+  bairro: "",
+  complemento: ""
+});
 const lista = ref<any[]>([]);
 const errors = ref<string[]>([]);
+const loading = ref<boolean>(true);
+const editandoId = ref<number | null>(null);
 
 async function carregar() {
-  const r = await api.get("/api/clientes", auth);
-  lista.value = r.data.data ?? r.data;
+  try {
+    loading.value = true;
+    const r = await api.get("/api/clientes");
+    lista.value = r.data.data ?? r.data;
+  } catch(err) {
+    console.error("Erro ao carregar clientes:", err);
+    errors.value = ["Erro ao carregar clientes. Verifique a conexão."];
+  } finally {
+    loading.value = false;
+  }
 }
 
 function validar(): string[] {
@@ -64,17 +99,108 @@ async function salvar() {
   if (errors.value.length) return;
 
   try {
-    await api.post("/api/clientes", form.value, auth);
+    // Remove máscaras antes de enviar para o backend
+    const payload = {
+      ...form.value,
+      telefone: limparTelefone(form.value.telefone),
+      cep: limparCep(form.value.cep)
+    };
+    
+    if (editandoId.value) {
+      // Atualizar cliente existente
+      await api.put(`/api/clientes/${editandoId.value}`, payload);
+    } else {
+      // Criar novo cliente
+      await api.post("/api/clientes", payload);
+    }
+    
     await carregar();
     reset();
   } catch (err: any) {
     errors.value = err?.validation ?? ["Erro inesperado."];
   }
 }
-function reset(){ form.value = { nome:"", email:"", telefone:"", cep:"" }; }
+
+function editar(cliente: any) {
+  editandoId.value = cliente.id;
+  
+  // Aplica máscaras nos campos
+  const telefoneMask = cliente.telefone?.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3') || 
+                       cliente.telefone?.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3') || '';
+  const cepMask = cliente.cep?.replace(/(\d{5})(\d{3})/, '$1-$2') || '';
+  
+  form.value = {
+    nome: cliente.nome || '',
+    email: cliente.email || '',
+    telefone: telefoneMask,
+    data_nascimento: cliente.data_nascimento || '',
+    cep: cepMask,
+    endereco: cliente.endereco || '',
+    bairro: cliente.bairro || '',
+    complemento: cliente.complemento || ''
+  };
+  
+  // Scroll para o formulário
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function reset(){ 
+  editandoId.value = null;
+  form.value = { 
+    nome: "", 
+    email: "", 
+    telefone: "", 
+    data_nascimento: "",
+    cep: "",
+    endereco: "",
+    bairro: "",
+    complemento: ""
+  }; 
+}
 async function remover(id:number){
-  await api.delete(`/api/clientes/${id}`, auth);
+  await api.delete(`/api/clientes/${id}`);
   await carregar();
+}
+
+// Máscaras
+function aplicarMascaraTelefone(e: Event) {
+  const input = e.target as HTMLInputElement;
+  form.value.telefone = formatarTelefone(input.value);
+}
+
+function aplicarMascaraCep(e: Event) {
+  const input = e.target as HTMLInputElement;
+  form.value.cep = formatarCep(input.value);
+}
+
+async function buscarCep() {
+  const cepLimpo = form.value.cep.replace(/\D/g, '');
+  
+  // Verifica se tem 8 dígitos
+  if (cepLimpo.length !== 8) return;
+  
+  try {
+    const r = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+    const dados = await r.json();
+    
+    if (dados.erro) {
+      errors.value = ['CEP não encontrado'];
+      return;
+    }
+    
+    // Preenche automaticamente os campos
+    form.value.endereco = dados.logradouro || '';
+    form.value.bairro = dados.bairro || '';
+    if (dados.complemento) {
+      form.value.complemento = dados.complemento;
+    }
+    
+    // Limpa erro se tinha
+    errors.value = [];
+  } catch (err) {
+    console.error('Erro ao buscar CEP:', err);
+    // Não mostra erro para não quebrar o fluxo
+  }
 }
 
 onMounted(carregar);

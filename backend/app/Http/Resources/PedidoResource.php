@@ -11,11 +11,11 @@ class PedidoResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "cliente" => [
+            "cliente" => $this->cliente ? [
                 "id" => $this->cliente->id,
                 "nome" => $this->cliente->nome,
                 "email" => $this->cliente->email,
-            ],
+            ] : null,
             "itens" => PedidoItemResource::collection($this->itens),
             "total" => (float) $this->itens->sum(fn($i) => $i->preco_unitario * $i->quantidade),
             "criado_em" => optional($this->created_at)->toDateTimeString(),

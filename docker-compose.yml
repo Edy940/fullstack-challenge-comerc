@@ -65,6 +65,7 @@
     working_dir: /app
     volumes:
       - ./frontend:/app
+      - node_modules:/app/node_modules
     command: bash -lc "npm install && npm run dev -- --host"
     ports:
       - "5173:5173"
@@ -73,3 +74,4 @@
 
 volumes:
   dbdata:
+  node_modules:
