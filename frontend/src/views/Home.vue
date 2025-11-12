@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Bem-vindo(a) à Pastelaria</h2>
+    <h2>Bem-vindo(a) à Pastelaria Monte Sião</h2>
     <p>Gerencie clientes, produtos e pedidos.</p>
   </div>
 </template>

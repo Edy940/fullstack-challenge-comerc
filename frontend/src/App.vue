@@ -1,7 +1,7 @@
 <template>
   <main class="container">
     <header class="appbar">
-      <h1>Pastelaria</h1>
+      <h1>🥟Sistema Monte Sião</h1>
       <nav>
         <RouterLink to="/">Home</RouterLink>
         <RouterLink to="/clientes">Clientes</RouterLink>

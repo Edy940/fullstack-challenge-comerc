@@ -5,6 +5,15 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" }
 });
 
+// Intercepta todas as requisições para adicionar autenticação
+api.interceptors.request.use((config: any) => {
+  config.auth = {
+    username: "admin@pastelaria.local",
+    password: "secret123"
+  };
+  return config;
+});
+
 // Intercepta 422 do backend e normaliza mensagens
 api.interceptors.response.use(
   (r: any) => r,
