@@ -11,7 +11,7 @@ class ClienteController extends Controller
 {
     public function index()
     {
-        return ClienteResource::collection(Cliente::latest()->paginate(10));
+        return ClienteResource::collection(Cliente::orderBy('nome')->paginate(10));
     }
 
     public function store(StoreClienteRequest $request)

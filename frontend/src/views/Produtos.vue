@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Produtos</h2>
+    <h2>Cadastrar Produtos</h2>
 
     <ErrorAlert :messages="errors" />
 
@@ -27,6 +27,8 @@
     </form>
 
     <hr style="margin:16px 0" />
+
+    <h3 style="margin-bottom: 12px; color: #333;">Produtos Cadastrados</h3>
 
     <table class="table">
       <thead><tr><th>#</th><th>Nome</th><th>Preço</th><th>Tipo</th><th></th></tr></thead>

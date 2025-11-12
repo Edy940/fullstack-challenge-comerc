@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Dados do Cliente</h2>
+    <h2>{{ editandoId ? 'Editar Cliente' : 'Cadastrar Cliente' }}</h2>
 
     <ErrorAlert :messages="errors" />
 
@@ -25,11 +25,13 @@
         <InputField label="Bairro" v-model="form.bairro" />
         <InputField label="Complemento" v-model="form.complemento" placeholder="Apto, Bloco, etc (opcional)" />
       </div>
-      <button class="btn" type="submit">Salvar</button>
-      <button class="btn ghost" type="button" @click="reset">Limpar</button>
+      <button class="btn" type="submit">{{ editandoId ? 'Atualizar' : 'Salvar' }}</button>
+      <button class="btn ghost" type="button" @click="reset">{{ editandoId ? 'Cancelar' : 'Limpar' }}</button>
     </form>
 
     <hr style="margin:16px 0" />
+
+    <h3 style="margin-bottom: 12px; color: #333;">Clientes Cadastrados</h3>
 
     <table class="table">
       <thead><tr><th>#</th><th>Nome</th><th>E-mail</th><th></th></tr></thead>
@@ -38,7 +40,10 @@
           <td>{{ c.id }}</td>
           <td>{{ c.nome }}</td>
           <td>{{ c.email }}</td>
-          <td><button class="btn ghost" @click="remover(c.id)">Remover</button></td>
+          <td>
+            <button class="btn ghost" @click="editar(c)" style="margin-right: 8px;">Editar</button>
+            <button class="btn ghost" @click="remover(c.id)">Remover</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -65,6 +70,7 @@ const form = ref({
 const lista = ref<any[]>([]);
 const errors = ref<string[]>([]);
 const loading = ref<boolean>(true);
+const editandoId = ref<number | null>(null);
 
 async function carregar() {
   try {
@@ -95,17 +101,50 @@ async function salvar() {
     // Remove máscaras antes de enviar para o backend
     const payload = {
       ...form.value,
-      telefone: form.value.telefone.replace(/\D/g, ''), // Remove tudo que não é número
-      cep: form.value.cep.replace(/\D/g, '')             // Remove tudo que não é número
+      telefone: form.value.telefone.replace(/\D/g, ''),
+      cep: form.value.cep.replace(/\D/g, '')
     };
-    await api.post("/api/clientes", payload);
+    
+    if (editandoId.value) {
+      // Atualizar cliente existente
+      await api.put(`/api/clientes/${editandoId.value}`, payload);
+    } else {
+      // Criar novo cliente
+      await api.post("/api/clientes", payload);
+    }
+    
     await carregar();
     reset();
   } catch (err: any) {
     errors.value = err?.validation ?? ["Erro inesperado."];
   }
 }
+
+function editar(cliente: any) {
+  editandoId.value = cliente.id;
+  
+  // Aplica máscaras nos campos
+  const telefoneMask = cliente.telefone?.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3') || 
+                       cliente.telefone?.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3') || '';
+  const cepMask = cliente.cep?.replace(/(\d{5})(\d{3})/, '$1-$2') || '';
+  
+  form.value = {
+    nome: cliente.nome || '',
+    email: cliente.email || '',
+    telefone: telefoneMask,
+    data_nascimento: cliente.data_nascimento || '',
+    cep: cepMask,
+    endereco: cliente.endereco || '',
+    bairro: cliente.bairro || '',
+    complemento: cliente.complemento || ''
+  };
+  
+  // Scroll para o formulário
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function reset(){ 
+  editandoId.value = null;
   form.value = { 
     nome: "", 
     email: "", 

@@ -1,6 +1,6 @@
 $readme = @'
 # 🍴 Fullstack Challenge – Comerc  
-### Sistema de Gerenciamento de Pedidos – *Pastelaria*  
+### Sistema de Gerenciamento de Pedidos – *Pastelaria Monte Sião*  
 
 Aplicação **Fullstack** desenvolvida com **Laravel 11 (API)** e **Vue 3 + Vite (Frontend)**, totalmente **dockerizada**, responsiva e com **testes automatizados acima de 90% de cobertura**.
 

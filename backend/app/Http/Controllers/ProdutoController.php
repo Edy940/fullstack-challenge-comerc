@@ -11,7 +11,7 @@ class ProdutoController extends Controller
 {
     public function index()
     {
-        return ProdutoResource::collection(Produto::with("tipo")->latest()->get());
+        return ProdutoResource::collection(Produto::with("tipo")->orderBy('nome')->get());
     }
 
     public function store(StoreProdutoRequest $request)
