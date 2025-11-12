@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Pedidos</h2>
+    <h2>Realizar Pedido</h2>
 
     <ErrorAlert :messages="errors" />
 
@@ -37,6 +37,8 @@
     </form>
 
     <hr style="margin:16px 0" />
+
+    <h3 style="margin-bottom: 12px; color: #333;">Pedidos Prontos</h3>
 
     <table class="table">
       <thead><tr><th>#</th><th>Cliente</th><th>Total</th><th></th></tr></thead>
